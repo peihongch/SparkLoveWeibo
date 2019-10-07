@@ -11,11 +11,11 @@ public class MongodbTest {
 
         Block<Document> printBlock = document -> System.out.println(document.toJson());
 
-//        for (String name:database.listCollectionNames()) {
-//            var collection = database.getCollection(name);
-//            collection.find().forEach(printBlock);
-//        }
-        database.getCollection("base_info").find().forEach(printBlock);
+        for (String name:database.listCollectionNames()) {
+            var collection = database.getCollection(name);
+            collection.find().forEach(printBlock);
+        }
+//        database.getCollection("base_info").find().forEach(printBlock);
 
     }
 }
