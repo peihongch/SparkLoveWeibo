@@ -1,14 +1,19 @@
+package util;
+
 import com.mongodb.spark.MongoSpark;
 import com.mongodb.spark.config.ReadConfig;
 import com.mongodb.spark.rdd.api.java.JavaMongoRDD;
+import entity.BaseInfo;
+import entity.WeiboItem;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import org.bson.Document;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MongoUtil {
+public final class MongoUtil {
     public static final String MONGODB_URL = "mongodb://94.191.110.118:27017";
     public static final String DATABASE = "university_weibo";
     public static final String DEFAULT_COLLECTION = "base_info";
@@ -40,5 +45,14 @@ public class MongoUtil {
 
     public JavaMongoRDD<Document> getUniversityRDD(String universityId) {
         return getWeiboRDD(universityId + "_weibo_info");
+    }
+
+    public Dataset<BaseInfo> getBaseInfoDataset() {
+        return getBaseInfoRDD().toDS(BaseInfo.class);
+    }
+
+    public Dataset<WeiboItem> getUniversityDataset(String universityId) {
+        JavaMongoRDD<Document> rdd = getUniversityRDD(universityId);
+        return rdd.toDS(WeiboItem.class);
     }
 }

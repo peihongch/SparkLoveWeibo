@@ -1,6 +1,7 @@
 import com.mongodb.Block;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
@@ -12,7 +13,7 @@ public class MongodbTest {
         Block<Document> printBlock = document -> System.out.println(document.toJson());
 
         for (String name:database.listCollectionNames()) {
-            var collection = database.getCollection(name);
+            MongoCollection<Document> collection = database.getCollection(name);
             collection.find().forEach(printBlock);
         }
 //        database.getCollection("base_info").find().forEach(printBlock);

@@ -2,6 +2,7 @@ import com.mongodb.spark.rdd.api.java.JavaMongoRDD;
 import entity.WeiboItem;
 import org.apache.spark.sql.Dataset;
 import org.bson.Document;
+import util.MongoUtil;
 
 public class SparkMongo {
     public static void main(String[] args) {

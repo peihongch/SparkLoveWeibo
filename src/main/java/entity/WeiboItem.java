@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class WeiboItem {
+public final class WeiboItem {
     // 微博id
     String id;
 
-    // 如果非null，则该条微博是转发的，respost是原微博作者
+    // 如果非null，则该条微博是转发的，repost是原微博作者
     String repost;
 
     // 微博内容
@@ -30,7 +30,7 @@ public class WeiboItem {
     String likeNum;
 
     // 转发数量
-    String respostNum;
+    String repostNum;
 
     // 评论数量
     String commentNum;
