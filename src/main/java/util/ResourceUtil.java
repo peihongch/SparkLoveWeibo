@@ -6,7 +6,7 @@ import java.util.Properties;
 public final class ResourceUtil {
     public static Properties getUniversityList() throws FileNotFoundException {
         Properties props = new Properties();
-        FileInputStream in = new FileInputStream("/home/steve/Documents/专业课程文档/云计算/作业/Java-PageRank/src/main/resources/university_list.txt");
+        FileInputStream in = new FileInputStream("src/main/resources/university_list.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         reader.lines().forEach(line -> {
             String[] splits = line.split(" ");
