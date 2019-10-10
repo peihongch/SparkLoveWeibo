@@ -20,22 +20,47 @@ public final class TimeUtil {
         return date;
     }
 
+    public static String extractYerAndMonth(String dateStr) {
+        String[] splits = dateStr.split("-");
+        int month = Integer.parseInt(splits[1]);
+        if (month < 4) {
+            return splits[0] + "_" + 1;
+        } else if (month < 7) {
+            return splits[0] + "_" + 4;
+        } else if (month < 10) {
+            return splits[0] + "_" + 7;
+        } else return splits[0] + "_" + 10;
+    }
+
     /**
      * judge if target during period [startYear, endYear)
      *
      * @param target    target date
      * @param startYear included
      * @param endYear   excluded
+     * @param month     start month
      * @return true or false
      */
-    public static boolean isBetween(Date target, int startYear, int endYear) {
-        Date startDate = parseDate(startYear + "-01-01 00:00:00");
-        Date endDate = parseDate(endYear + "-01-01 00:00:00");
+    public static boolean isBetween(Date target, int startYear, int endYear, int month) {
+        String startMonStr, endMonStr, startYearStr = startYear + "", endYearStr;
+        if (month < 10) {
+            startMonStr = "0" + month;
+            if (month < 7) endMonStr = "0" + (month + 4);
+            else endMonStr = "" + (month + 4);
+            endYearStr = startYear + "";
+        } else {
+            startMonStr = "" + month;
+            endMonStr = "01";
+            endYearStr = endYear + "";
+        }
+        Date startDate = parseDate(startYearStr + "-" + startMonStr + "-01 00:00:00");
+        Date endDate = parseDate(endYearStr + "-" + endMonStr + "-01 00:00:00");
         return target.before(endDate) && startDate.before(target);
     }
 
     public static void main(String[] args) {
-        Date date = parseDate("2019-10-06 09:41");
-        System.out.println(date.toString());
+        System.out.println(extractYerAndMonth("2018-02-06 09:41"));
+        final String template = "{\"%s\":{\"id\":\"%s\",\"forward\":\"%s\",\"at\":\"%s\",\"likeNum\":\"%s,\"forwardNum\":\"%s,\"commentNum\":\"%s\"}}";
+        System.out.println(String.format(template, 1,1,1,1,1,1,1));
     }
 }
