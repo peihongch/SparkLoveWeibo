@@ -9,13 +9,13 @@ object PageRank {
     val sc = new SparkContext(conf)
 
     // Load the edges as a graph
-    val followsGraph = GraphLoader.edgeListFile(sc, "/home/steve/Documents/专业课程文档/云计算/作业/Java-PageRank/follows_list.txt")
+    val followsGraph = GraphLoader.edgeListFile(sc, "data/follows_list.txt")
     // Run PageRank
     val ranks = followsGraph.pageRank(0.000000000001).vertices
 
     println(ranks.first())
 
-    val universityHashCodeTable = sc.textFile("/home/steve/Documents/专业课程文档/云计算/作业/Java-PageRank/university_hash_code.txt").map { line =>
+    val universityHashCodeTable = sc.textFile("data/university_hash_code.txt").map { line =>
       val fields = line.split("\\s+")
       (fields(0).toLong, (fields(1), fields(2)))
     }
