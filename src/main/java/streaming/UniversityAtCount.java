@@ -19,16 +19,16 @@ public class UniversityAtCount {
     public static final String INPUT_MONGODB_URL = "mongodb://94.191.110.118:27017";
     public static final String INPUT_DATABASE = "university_weibo";
     public static final String INPUT_DEFAULT_COLLECTION = "base_info";
-    public static final String OUTPUT_MONGODB_URL = "mongodb://127.0.0.1:27017";
+    public static final String OUTPUT_MONGODB_URL = "mongodb://heiming.xyz:27017";
     public static final String OUTPUT_DATABASE = "university_at_relation";
     public static final String OUTPUT_DEFAULT_COLLECTION = "at_counts";
     private static final String template = "{\"university\":\"%s\",\"atNum\":\"%s\"}";
+    private static List<String> universityIds = new ArrayList<>();
 
 
     public static void main(String[] args) throws Exception{
-        List<String> universityIds = new ArrayList<>();
         Collection<Object> universityNames = ResourceUtil.getUniversityList().values();
-        SparkSession sparkSession = SparkSession.builder().master("local[8]").appName("WeiboAtCount")
+        SparkSession sparkSession = SparkSession.builder().master("local[8]").appName("UniversityAtCount")
                 .config("spark.mongodb.input.uri", INPUT_MONGODB_URL + "/" + INPUT_DATABASE + "." + INPUT_DEFAULT_COLLECTION)
                 .config("spark.mongodb.input.partitioner", "MongoSamplePartitioner")
                 .config("spark.mongodb.output.uri", OUTPUT_MONGODB_URL + "/" + OUTPUT_DATABASE + "." + OUTPUT_DEFAULT_COLLECTION)
@@ -56,5 +56,7 @@ public class UniversityAtCount {
             WriteConfig writeConfig = WriteConfig.create(jsc).withOptions(writeOverrides);
             MongoSpark.save(results, writeConfig);
         }
+
+        jsc.stop();
     }
 }
