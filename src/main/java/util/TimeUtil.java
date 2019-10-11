@@ -2,9 +2,23 @@ package util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public final class TimeUtil {
+    public static List<String> getMonths() {
+        List<String> months = new ArrayList<>();
+        for (int i = 2013; i < 2020; i++) {
+            for (int j = 1; j <= 12; j ++) {
+                String month = String.valueOf(j);
+                month = month.length()==1? "0"+month: month;
+                months.add(i+"-"+month);
+            }
+        }
+        return months;
+    }
+
     /**
      * @param dateStr like "2019-10-06 09:41"
      * @return java.util.Date
