@@ -16,15 +16,22 @@ object MongoScala {
     val baseInfoRdd = MongoSpark.load(spark.sparkContext, readConfig)
     val universityIdList = baseInfoRdd.map(document => {
       (document.get("id"))
-    })
+    }).collect()
 
-//    universityIdList.flatMap { universityId =>
-//      val collection: String = universityId + "_weibo_info"
-//      val readConfig = ReadConfig(Map("collection" -> collection, "database" -> "university_weibo", "uri" -> "mongodb://94.191.110.118:27017"))
-//      val univRdd = MongoSpark.load(spark.sparkContext, readConfig)
-//      univRdd.map{
-//        document=>(document.get("id"), document.get(""))
-//      }
-//    }
+    val rdd = universityIdList.flatMap { universityId =>
+      val collection: String = universityId + "_weibo_info"
+      val readConfig = ReadConfig(Map("collection" -> collection, "database" -> "university_weibo", "uri" -> "mongodb://94.191.110.118:27017"))
+      val univRdd = MongoSpark.load(spark.sparkContext, readConfig)
+      univRdd.map {
+        document =>
+          (document.get("id"), document.get("at"))
+      }.filter { t =>
+        print(t, "\t")
+        println(t._2)
+        t._2 != ""
+      }.collect().iterator
+    }
+
+    println(rdd)
   }
 }
