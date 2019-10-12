@@ -18,7 +18,7 @@ public class SaveDataByMonth {
     public static final String INPUT_MONGODB_URL = "mongodb://94.191.110.118:27017";
     public static final String INPUT_DATABASE = "university_weibo";
     public static final String INPUT_DEFAULT_COLLECTION = "base_info";
-    public static final String OUTPUT_MONGODB_URL = "mongodb://127.0.0.1:27017";
+    public static final String OUTPUT_MONGODB_URL = "mongodb://heiming.xyz:27017";
     public static final String OUTPUT_DATABASE = "month_weibo";
     public static final String OUTPUT_DEFAULT_COLLECTION = "time_period";
 
@@ -31,7 +31,6 @@ public class SaveDataByMonth {
                 .config("spark.mongodb.output.uri", OUTPUT_MONGODB_URL + "/" + OUTPUT_DATABASE + "." + OUTPUT_DEFAULT_COLLECTION)
                 .getOrCreate();
         JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
-        JavaMongoRDD<Document> baseInfoRDD = MongoSpark.load(jsc);
 
         List<String> months = TimeUtil.getMonths();
         Map<String, String> readOverrides = new HashMap<>();
