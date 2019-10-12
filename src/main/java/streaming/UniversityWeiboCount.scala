@@ -28,7 +28,7 @@ object UniversityWeiboCount {
       val collection = "university_heat" + c
       val readConfig = ReadConfig(Map("collection" -> collection, "database" -> "university_heat", "uri" -> "mongodb://heiming.xyz:27017"))
       MongoSpark.load(spark.sparkContext, readConfig).map(document =>
-        (document.get("month").toString, universityList(c), document.getString("likeNum").toInt, document.getString("repostNum").toInt, document.getString("commentNum").toInt))
+        (document.get("month").toString, universityList(c - 1), document.getString("likeNum").toInt, document.getString("repostNum").toInt, document.getString("commentNum").toInt))
     }
     }.reduce(_ union _)
 
@@ -44,11 +44,11 @@ object UniversityWeiboCount {
       val repost: AtomicInteger = new AtomicInteger(0)
       val comment: AtomicInteger = new AtomicInteger(0)
       g._2.toList.sortBy(t => t._1).map { t =>
-        val v3 = t._3 + like.get()
+        val v3 = t._3 + like.get() / 2
         like.set(v3)
-        val v4 = t._4 + repost.get()
+        val v4 = t._4 + repost.get() / 2
         repost.set(v4)
-        val v5 = t._5 + comment.get()
+        val v5 = t._5 + comment.get() / 2
         comment.set(v5)
         (t._1, t._2, v3, v4, v5)
       }.iterator
@@ -60,60 +60,56 @@ object UniversityWeiboCount {
     val groupedRDD = accumulatedRDD.groupBy(item => item._1)
 
     // 统计点赞数
-    val likeOut = groupedRDD.map { t =>
+    val likeOutSorted = groupedRDD.map { t =>
       val valuePair = t._2.map { univ => (univ._2, univ._3) }.toList.sortBy(value => -value._2)
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
     }.sortByKey()
-      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
-    //    likePW.println(likeOut)
+    likePW.println(likeOutSorted.map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n"))
+    val likeOut = likeOutSorted.map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
     likeOut.foreach { entry =>
       val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/like/" + entry._1 + ".json")), true)
       PW.println(entry._2)
     }
 
     // 统计转发数
-    val repostOut = groupedRDD.map { t =>
+    val repostOutSorted = groupedRDD.map { t =>
       val valuePair = t._2.map { univ => (univ._2, univ._4) }.toList.sortBy(value => -value._2)
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
     }.sortByKey()
-      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
-    //    forwardPW.println(repostOut)
+    forwardPW.println(repostOutSorted.map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n"))
+    val repostOut = repostOutSorted.map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
     repostOut.foreach { entry =>
       val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/repost/" + entry._1 + ".json")), true)
       PW.println(entry._2)
     }
 
     // 统计评论数
-    val commentOut = groupedRDD.map { t =>
+    val commentOutSorted = groupedRDD.map { t =>
       val valuePair = t._2.map { univ => (univ._2, univ._5) }.toList.sortBy(value => -value._2)
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
     }.sortByKey()
-      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
-    //    commentPW.println(commentOut)
+    commentPW.println(commentOutSorted.map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n"))
+    val commentOut = commentOutSorted.map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
     commentOut.foreach { entry =>
       val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/comment/" + entry._1 + ".json")), true)
       PW.println(entry._2)
     }
 
     // 统计热度
-    val totalOut = groupedRDD.map { t =>
+    val totalOutSorted = groupedRDD.map { t =>
       val valuePair = t._2.map { univ => (univ._2, univ._3 + 3 * univ._4 + 2 * univ._5) }.toList.sortBy(value => -value._2)
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
     }.sortByKey()
-      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
-    //    totalPW.println(totalOut)
+    totalPW.println(totalOutSorted.map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n"))
+    val totalOut = totalOutSorted.map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
     totalOut.foreach { entry =>
       val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/total/" + entry._1 + ".json")), true)
       PW.println(entry._2)
