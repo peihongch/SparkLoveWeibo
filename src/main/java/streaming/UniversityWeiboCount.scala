@@ -65,8 +65,14 @@ object UniversityWeiboCount {
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
-    }.sortByKey().map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-    likePW.println(likeOut)
+    }.sortByKey()
+      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
+      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
+    //    likePW.println(likeOut)
+    likeOut.foreach { entry =>
+      val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/like/" + entry._1 + ".json")), true)
+      PW.println(entry._2)
+    }
 
     // 统计转发数
     val repostOut = groupedRDD.map { t =>
@@ -74,8 +80,14 @@ object UniversityWeiboCount {
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
-    }.sortByKey().map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-    forwardPW.println(repostOut)
+    }.sortByKey()
+      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
+      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
+    //    forwardPW.println(repostOut)
+    repostOut.foreach { entry =>
+      val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/repost/" + entry._1 + ".json")), true)
+      PW.println(entry._2)
+    }
 
     // 统计评论数
     val commentOut = groupedRDD.map { t =>
@@ -83,8 +95,14 @@ object UniversityWeiboCount {
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
-    }.sortByKey().map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-    commentPW.println(commentOut)
+    }.sortByKey()
+      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
+      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
+    //    commentPW.println(commentOut)
+    commentOut.foreach { entry =>
+      val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/comment/" + entry._1 + ".json")), true)
+      PW.println(entry._2)
+    }
 
     // 统计热度
     val totalOut = groupedRDD.map { t =>
@@ -92,8 +110,14 @@ object UniversityWeiboCount {
         .take(5) // 取前五
         .map(value => String.format(rankPattern, value._1.toString, value._2.toString)).mkString(",")
       (t._1, valuePair)
-    }.sortByKey().map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
-    totalPW.println(totalOut)
+    }.sortByKey()
+      //      .map(t => t._1 + "\t" + String.format(jsonPattern, t._1, t._2)).collect().mkString("\n")
+      .map(t => (t._1, String.format(jsonPattern, t._1, t._2))).collectAsMap()
+    //    totalPW.println(totalOut)
+    totalOut.foreach { entry =>
+      val PW = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/total/" + entry._1 + ".json")), true)
+      PW.println(entry._2)
+    }
 
   }
 }
