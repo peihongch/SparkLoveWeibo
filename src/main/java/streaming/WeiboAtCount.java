@@ -99,7 +99,7 @@ public class WeiboAtCount {
                         , DataTypes.createStructField("num", DataTypes.LongType, true)
                 });
                 Dataset<Row> lines = sparkSession.createDataFrame(rowRDD, schema);
-                MongoSpark.write(lines).option("collection", "AtCounts"+accumulator.value())
+                MongoSpark.write(lines).option("collection", "at_counts_"+accumulator.value())
                         .mode(SaveMode.Overwrite).save();
             }
         });

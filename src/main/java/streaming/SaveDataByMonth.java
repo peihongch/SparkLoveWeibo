@@ -29,7 +29,16 @@ public class SaveDataByMonth {
                 .config("spark.mongodb.input.uri", INPUT_MONGODB_URL + "/" + INPUT_DATABASE + "." + INPUT_DEFAULT_COLLECTION)
                 .config("spark.mongodb.input.partitioner", "MongoSamplePartitioner")
                 .config("spark.mongodb.output.uri", OUTPUT_MONGODB_URL + "/" + OUTPUT_DATABASE + "." + OUTPUT_DEFAULT_COLLECTION)
+//                .config("spark.cores.max", "12")
+//                .config("spark.executor.cores", "4")
+//                .config("spark.executor.memory", "4g")
                 .getOrCreate();
+//        sparkSession.conf().set("spark.driver.cores", "4");
+//        sparkSession.conf().set("spark.driver.memory", "4g");
+//        sparkSession.conf().set("spark.cores.max", "12");
+//        sparkSession.conf().set("spark.executor.memory", "4g");
+//        sparkSession.conf().set("spark.executor.cores", "4");
+//        sparkSession.conf().set("spark.default.parallelism", "800");
         JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
 
         List<String> months = TimeUtil.getMonths();

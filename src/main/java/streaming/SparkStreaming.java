@@ -157,7 +157,7 @@ public class SparkStreaming {
                         , DataTypes.createStructField("atNum", DataTypes.StringType, true)
                 });
                 Dataset<Row> lines = sparkSession.createDataFrame(rowRDD, schema);
-                MongoSpark.write(lines).option("collection", "heatByMonth"+accumulator.value())
+                MongoSpark.write(lines).option("collection", "heat_month_"+accumulator.value())
                         .mode(SaveMode.Overwrite).save();
             }
         });
