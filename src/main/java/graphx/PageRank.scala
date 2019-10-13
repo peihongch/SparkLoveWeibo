@@ -1,9 +1,14 @@
 package graphx
 
+import java.io.{FileOutputStream, OutputStreamWriter, PrintWriter}
+
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.graphx.GraphLoader
 
 object PageRank {
+  val jsonPattern = "{\"rankList\":[%s]}"
+  val rankPattern = "{\"name\":\"%s\",\"rank\":%s}"
+
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf().setAppName("PageRank").setMaster("local[8]")
     val sc = new SparkContext(conf)
@@ -13,21 +18,20 @@ object PageRank {
     // Run PageRank
     val ranks = followsGraph.pageRank(0.000000000001).vertices
 
-    println(ranks.first())
-
     val universityHashCodeTable = sc.textFile("data/university_hash_code.txt").map { line =>
       val fields = line.split("\\s+")
       (fields(0).toLong, (fields(1), fields(2)))
     }
 
-    println(universityHashCodeTable.first())
-
     val ranksByUsername = universityHashCodeTable.join(ranks).map {
-      case (id, ((uid, uname), rank)) => (rank, (uid, uname))
+      case (id, ((uid, uname), rank)) => (rank, uname)
     }
 
-    val rankedRDD = ranksByUsername.sortByKey()
-    println(rankedRDD.collect().mkString("\n"))
-    println(rankedRDD.count())
+    val rankedResult = ranksByUsername.sortBy(item => item._1, ascending = false)
+      .map { case (rank, name) => String.format(rankPattern, name, rank.toString) }
+      .collect().mkString(",")
+    val pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output/graphX/follows_pagerank.json")), true)
+    pw.println(String.format(jsonPattern, rankedResult))
+    pw.close()
   }
 }

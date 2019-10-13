@@ -24,10 +24,11 @@ public class UniversityAtCount {
     public static final String OUTPUT_DEFAULT_COLLECTION = "at_counts";
     private static final String template = "{\"university\":\"%s\",\"atNum\":\"%s\"}";
     private static List<String> universityIds = new ArrayList<>();
+    private static Collection<Object> universityNames;
 
 
     public static void main(String[] args) throws Exception{
-        Collection<Object> universityNames = ResourceUtil.getUniversityList().values();
+        universityNames = ResourceUtil.getUniversityList().values();
         SparkSession sparkSession = SparkSession.builder().master("local[8]").appName("UniversityAtCount")
                 .config("spark.mongodb.input.uri", INPUT_MONGODB_URL + "/" + INPUT_DATABASE + "." + INPUT_DEFAULT_COLLECTION)
                 .config("spark.mongodb.input.partitioner", "MongoSamplePartitioner")
@@ -47,7 +48,7 @@ public class UniversityAtCount {
                     .filter(document -> !document.getList("at", String.class).isEmpty())
                     .flatMap(document -> document.getList("at", String.class).iterator())
                     .map(university -> university.substring(1))
-                    .filter(universityNames::contains)
+                    .filter(item->universityNames.contains(item))
                     .mapToPair(universityName -> new Tuple2<>(universityName, BigInteger.ONE))
                     .reduceByKey(BigInteger::add);
             JavaRDD<Document> results = atCounts
