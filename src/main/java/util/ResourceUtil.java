@@ -1,6 +1,8 @@
 package util;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public final class ResourceUtil {
@@ -30,10 +32,21 @@ public final class ResourceUtil {
         return props;
     }
 
+    public static List<String> getIds() throws FileNotFoundException {
+        List<String> ids = new ArrayList<String>();
+        FileInputStream in = new FileInputStream("src/main/resources/university_list.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        reader.lines().forEach(line -> {
+            String[] splits = line.split(" ");
+            ids.add(splits[0]);
+        });
+        return ids;
+    }
+
     public static void main(String[] args) throws FileNotFoundException {
-        Properties props = getUniversityList();
-        for (Object key : props.keySet()) {
-            System.out.println(key + "\t" + props.getProperty((String) key));
+        List<String> re = getIds();
+        for (String r:re) {
+            System.out.println(r);
         }
     }
 }
