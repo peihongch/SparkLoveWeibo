@@ -1,5 +1,7 @@
 package mllib
 
+import java.io.FileWriter
+
 import org.apache.spark.ml.clustering.KMeans
 import org.apache.spark.ml.evaluation.ClusteringEvaluator
 import org.apache.spark.ml.feature.LabeledPoint
@@ -14,25 +16,40 @@ object KMeans {
       .getOrCreate()
     val sc = spark.sparkContext
 
-    val rdd = sc.textFile("data/kmeans.txt").map(_.split("\\s+"))
+    val rdd = sc.textFile("data/train2.txt").map(_.split("\\s+"))
     val LabeledPointRdd = rdd.map(x=>LabeledPoint(0,Vectors.dense(x.map(_.toDouble))))
     val dataset = spark.createDataFrame(LabeledPointRdd).select("features")
 
-    // Trains a k-means model.
-    val kmeans = new KMeans().setK(2).setSeed(1L)
+//    for (a <- 2 until 10) {
+//      for (b <- 1 until 60) {
+//        val out = new FileWriter("data/compare2.txt",true)
+//        val kmeans = new KMeans().setK(a).setSeed(b.toLong)
+//        val model = kmeans.fit(dataset)
+//        val predictions = model.transform(dataset)
+//        val evaluator = new ClusteringEvaluator()
+//        val silhouette = evaluator.evaluate(predictions)
+//        out.write(s"$a $b $silhouette" + "\n")
+//        out.close()
+//      }
+//    }
+
+    val kmeans = new KMeans().setK(6).setSeed(21L)
     val model = kmeans.fit(dataset)
 
-    // Make predictions
     val predictions = model.transform(dataset)
 
-    // Evaluate clustering by computing Silhouette score
     val evaluator = new ClusteringEvaluator()
 
     val silhouette = evaluator.evaluate(predictions)
     println(s"Silhouette with squared euclidean distance = $silhouette")
 
-    // Shows the result.
     println("Cluster Centers: ")
     model.clusterCenters.foreach(println)
+
+    val out = new FileWriter("data/predict6.txt",false)
+    predictions.collect().foreach(row => {
+      out.write(String.valueOf(row(1))+"\n")
+    })
+    out.close()
   }
 }
